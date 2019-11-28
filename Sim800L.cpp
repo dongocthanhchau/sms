@@ -197,23 +197,28 @@ bool smsSend(String num, String msg)
   //Send End Transmition
   
   hwSerial.write(26);
-  vTaskDelay(2000/portTICK_PERIOD_MS);
+  vTaskDelay(1000/portTICK_PERIOD_MS);
+  
   
   
   int count=0;
-  while (hwSerial.available())
+  hwSerial.setTimeout(4000);
+  while (!Serial.available())
+      vTaskDelay(500/portTICK_PERIOD_MS);
+  if (!hwSerial.find("OK")) 
   {
-      if (!hwSerial.find("OK")) count++;
-      if (count>20) 
-      {
-          hwSerial.flush();
-          return 0;
-      }
+    hwSerial.flush();
+    return 0;
+  }
+  else
+  {
+    hwSerial.flush();
+    return 1;
+  }
+      
 //  {
 //    vTaskDelay(150/portTICK_PERIOD_MS);
 //    count++;
 //    if (count>20) return 0;
 //  }
-  hwSerial.flush();
-  return 1;
 }

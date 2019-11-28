@@ -2,6 +2,7 @@
 #include "Sim800L.h"
 #include "wifi.h"
 #include "blynk.h"
+
 int ledDelay = 1500/portTICK_PERIOD_MS;
 
 #if CONFIG_FREERTOS_UNICORE
@@ -9,8 +10,6 @@ int ledDelay = 1500/portTICK_PERIOD_MS;
 #else
 #define ARDUINO_RUNNING_CORE 1
 #endif
-
-
 
 // define tasks
 void TaskBlink( void *pvParameters );
