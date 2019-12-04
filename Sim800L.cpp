@@ -182,7 +182,7 @@ long balanceCheck(void)
 bool smsSend(String num, String msg)
 {
   hwSerial.flush();
-  
+  delay(1000);
   if (num.indexOf("0")==0) num.remove(0, 1);
   if (num.indexOf("+84")==0) num.remove(0, 3);
   hwSerial.println("AT+CMGF=1"); // Configuring TEXT mode
@@ -190,21 +190,21 @@ bool smsSend(String num, String msg)
   while (!hwSerial.find("OK"));
   //Send num data
   hwSerial.println("AT+CMGS=\"+84"+num+"\"");
-  vTaskDelay(200/portTICK_PERIOD_MS);
+  delay(200);
   //Send SMS data
   hwSerial.print(msg); //text content
-  vTaskDelay(200/portTICK_PERIOD_MS);
+  delay(200);
   //Send End Transmition
   
   hwSerial.write(26);
-  vTaskDelay(1000/portTICK_PERIOD_MS);
+  delay(2000);
   
-  
+  //Serial.println("SMS1");
   
   int count=0;
-  hwSerial.setTimeout(4000);
-  while (!Serial.available())
-      vTaskDelay(500/portTICK_PERIOD_MS);
+  hwSerial.setTimeout(5000);
+  while (!hwSerial.available())
+      delay(500);
   if (!hwSerial.find("OK")) 
   {
     hwSerial.flush();
@@ -215,7 +215,7 @@ bool smsSend(String num, String msg)
     hwSerial.flush();
     return 1;
   }
-      
+  //Serial.println("SMS2");
 //  {
 //    vTaskDelay(150/portTICK_PERIOD_MS);
 //    count++;
