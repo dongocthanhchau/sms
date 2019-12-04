@@ -10,7 +10,7 @@ const char* mqtt_server = "cretabase.kbvision.tv";
 #define MQTT_USER "minh"
 #define MQTT_PASSWORD "123"
 #define MQTT_SMS_RESULT "/result"
-#define MQTT_CMD "/cmnd"
+#define MQTT_CMD "/cmd"
 WiFiClient wifiClient;
 PubSubClient client(wifiClient);
 
@@ -55,10 +55,12 @@ void SMScallback(char* topic, byte *payload, unsigned int length)
         if (smsSend(to, text))
         {
             publishData(MQTT_SMS_RESULT,jsonSerialize(to,201,"SENT",messageId).c_str());
+            Serial.println("SENT");
         }
         else 
         {
             publishData(MQTT_SMS_RESULT,jsonSerialize(to,401,"CANT_SENT",messageId).c_str());
+            Serial.println("CAN'T SEND");
         }
       }
       else
