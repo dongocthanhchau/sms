@@ -88,7 +88,7 @@ void smsHandle(void)
       int function;
       String messageId;
       jsonDeserialize((char*) data, to, text, function, messageId);
-      if ((function==101)&&((to.length()==10)||(to.length()==13&&(to.indexOf("+84")!=-1)))&&(text.length()<=255))
+      if ((function==101)&&((to.length()==10)||(to.length()==13&&(to.indexOf("+84")!=-1)))/*&&(text.length()<=255)*/)
       {
         request->send(200,"text/plain",jsonSerialize(to,200,"SUCCESS",messageId));
         if (smsSend(to, text))

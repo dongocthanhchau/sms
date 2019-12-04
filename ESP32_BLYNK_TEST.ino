@@ -2,6 +2,7 @@
 #include "Sim800L.h"
 #include "wifi.h"
 #include "blynk.h"
+#include "mqtt.h"
 
 int ledDelay = 1500/portTICK_PERIOD_MS;
 
@@ -89,10 +90,12 @@ void TaskWifi(void *pvParameters)  // This is a task.
 {
   (void) pvParameters;
   Serial.println(wifiInit()?"WIFI Done":"WIFI FAIL");
-  
+  MQTTsetup();
   
   for (;;)
   {
+    MQTTloop();
+    vTaskDelay(1000/portTICK_PERIOD_MS);
     //Nothing Here
   }
 }

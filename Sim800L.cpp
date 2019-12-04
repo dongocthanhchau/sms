@@ -181,7 +181,7 @@ long balanceCheck(void)
 }
 bool smsSend(String num, String msg)
 {
-  hwSerial.flush();
+  //hwSerial.flush();
   delay(1000);
   if (num.indexOf("0")==0) num.remove(0, 1);
   if (num.indexOf("+84")==0) num.remove(0, 3);
@@ -192,27 +192,37 @@ bool smsSend(String num, String msg)
   hwSerial.println("AT+CMGS=\"+84"+num+"\"");
   delay(200);
   //Send SMS data
-  hwSerial.print(msg); //text content
+  String st="";
+  //Serial.println("SMS0");
+  while (msg.length()>100)
+  {
+      st = msg.substring(0,100);
+      //Serial.println(st);
+      hwSerial.print(st);
+      msg.remove(0,100);
+      delay(200);  
+  }
+  hwSerial.print(msg);
   delay(200);
+
   //Send End Transmition
-  
-  hwSerial.write(26);
-  delay(2000);
-  
   //Serial.println("SMS1");
-  
-  int count=0;
-  hwSerial.setTimeout(5000);
+  hwSerial.write(26);
   while (!hwSerial.available())
-      delay(500);
+      delay(1000);
+
+      
+  hwSerial.setTimeout(500);
+  int count = 1;
   if (!hwSerial.find("OK")) 
   {
-    hwSerial.flush();
-    return 0;
+    //hwSerial.flush();
+    count++;
+    if (count > 10) return 0;
   }
   else
   {
-    hwSerial.flush();
+    //hwSerial.flush();
     return 1;
   }
   //Serial.println("SMS2");
