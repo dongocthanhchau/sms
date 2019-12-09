@@ -1,8 +1,9 @@
 
-#include "Sim800L.h"
-#include "wifi.h"
-#include "blynk.h"
-#include "mqtt.h"
+#include "src\Sim800L.h"
+#include "src\wifi.h"
+#include "src\blynk.h"
+#include "src\mqtt.h"
+#include "src\NTPClock.h"
 
 int ledDelay = 1500/portTICK_PERIOD_MS;
 
@@ -21,8 +22,8 @@ void setup() {
   
   // initialize serial communication at 115200 bits per second:
   Serial.begin(115200);
-  disableCore0WDT();
-  disableCore1WDT();
+  //disableCore0WDT();
+  //disableCore1WDT();
   // Setup Task
   xTaskCreatePinnedToCore(
     TaskSim800
@@ -66,6 +67,16 @@ void setup() {
 void loop()
 {
   // Empty. Things are done in Tasks.
+  if (millis()>43000000)
+    {
+      Serial.println("RESETING...");
+      ESP.restart();
+    }
+   vTaskDelay(5000/portTICK_PERIOD_MS);
+   String state = "{\"status\":\"Running\",\"time\":" +  getTime() + "}";
+   
+   publishData("/STATUS",state.c_str());
+   reconnect();
 }
 
 /*--------------------------------------------------*/
@@ -91,11 +102,11 @@ void TaskWifi(void *pvParameters)  // This is a task.
   (void) pvParameters;
   Serial.println(wifiInit()?"WIFI Done":"WIFI FAIL");
   MQTTsetup();
-  
+  NTPInit();
   for (;;)
   {
     MQTTloop();
-    vTaskDelay(1000/portTICK_PERIOD_MS);
+    
     //Nothing Here
   }
 }
