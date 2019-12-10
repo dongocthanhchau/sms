@@ -5,7 +5,7 @@
 #include "src\mqtt.h"
 #include "src\NTPClock.h"
 
-int ledDelay = 1500/portTICK_PERIOD_MS;
+int ledDelay = 1000/portTICK_PERIOD_MS;
 
 #if CONFIG_FREERTOS_UNICORE
 #define ARDUINO_RUNNING_CORE 0
@@ -114,6 +114,9 @@ void TaskSim800(void *pvParameters)
 {
   (void) pvParameters;
   Serial.println(sim800Init()?"SIM 800 Done":"SIM 800 FAIL");
+  blinkLed(WIFI_LED);
+  delay(2000);
+  blinkLed(WIFI_LED);  
   for (;;)
   {
     //balanceInc("315329942286398");

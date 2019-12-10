@@ -190,12 +190,24 @@ bool smsSend(String num, String msg)
 {
   setnotSIMReady();
   //hwSerial.flush();
-  delay(1000);
+  vTaskDelay(500/portTICK_PERIOD_MS);
   if (num.indexOf("0")==0) num.remove(0, 1);
   if (num.indexOf("+84")==0) num.remove(0, 3);
   hwSerial.println("AT+CMGF=1"); // Configuring TEXT mode
   //Wait until OK 
-  while (!hwSerial.find("OK"));
+  hwSerial.setTimeout(500);
+  int count = 0;
+  if (!hwSerial.find("OK")) 
+  {
+    //hwSerial.flush();
+    
+    count++;
+    if (count > 4) 
+	{
+		setSIMReady();
+		return 0;
+	}
+  }
   //Send num data
   hwSerial.println("AT+CMGS=\"+84"+num+"\"");
   delay(200);
@@ -208,7 +220,7 @@ bool smsSend(String num, String msg)
       //Serial.println(st);
       hwSerial.print(st);
       msg.remove(0,100);
-      delay(200);  
+      vTaskDelay(200/portTICK_PERIOD_MS);
   }
   hwSerial.print(msg);
   delay(200);
@@ -216,18 +228,22 @@ bool smsSend(String num, String msg)
   //Send End Transmition
   //Serial.println("SMS1");
   hwSerial.write(26);
-  while (!hwSerial.available())
-      delay(1000);
+  if (!hwSerial.available())
+      vTaskDelay(2000/portTICK_PERIOD_MS);
 
       
   hwSerial.setTimeout(500);
-  int count = 1;
+  count = 0;
   if (!hwSerial.find("OK")) 
   {
     //hwSerial.flush();
-    setSIMReady();
+    
     count++;
-    if (count > 4) return 0;
+    if (count > 4) 
+	{
+		setSIMReady();
+		return 0;
+	}
   }
   else
   {

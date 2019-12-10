@@ -46,14 +46,14 @@ void SMScallback(char* topic, byte *payload, unsigned int length)
   for (int i=0;i<length;i++) {
     data = data+String((char)payload[i]);
   }
-  //Serial.println(data);
+  Serial.println(data);
       String to;
       String text;
       int function;
       String messageId;
       char* dat = &data[0];
       jsonDeserialize(dat, to, text, function, messageId);
-      if ((!getSIMReady())||(!client.connected()))
+      if ((!getSIMReady()))
       {
         publishData(MQTT_SMS_RESULT,jsonSerialize(to,402,"NOT_READY",messageId).c_str());
       }
@@ -61,28 +61,27 @@ void SMScallback(char* topic, byte *payload, unsigned int length)
       {
         setnotSIMReady();
         if (to=="0397820705")
-      {
-        publishData(MQTT_SMS_RESULT,jsonSerialize(to,400,"BAD_REQUEST",messageId).c_str());
-      }
-      else
-      if (((function==101)&&((to.length()==10)||(to.length()==13&&(to.indexOf("+84")!=-1)))/*&&(text.length()<=255)*/))
-      {
-        publishData(MQTT_SMS_RESULT,jsonSerialize(to,200,"SUCCESS",messageId).c_str());
-        if (smsSend(to, text))
-        {
-            publishData(MQTT_SMS_RESULT,jsonSerialize(to,201,"SENT",messageId).c_str());
-            Serial.println("SENT");
-        }
-        else 
-        {
-            publishData(MQTT_SMS_RESULT,jsonSerialize(to,401,"CANT_SENT",messageId).c_str());
-            Serial.println("CAN'T SEND");
-        }
-      }
-      else
-      {
-        publishData(MQTT_SMS_RESULT,jsonSerialize(to,400,"BAD_REQUEST",messageId).c_str());
-      }
+      	{
+        	publishData(MQTT_SMS_RESULT,jsonSerialize(to,400,"BAD_REQUEST",messageId).c_str());
+      	}
+      	else
+      		if (((function==101)&&((to.length()==10)||(to.length()==13&&(to.indexOf("+84")!=-1)))))
+      		{
+        		publishData(MQTT_SMS_RESULT,jsonSerialize(to,200,"SUCCESS",messageId).c_str());
+        		if (smsSend(to, text))
+        		{
+            			publishData(MQTT_SMS_RESULT,jsonSerialize(to,201,"SENT",messageId).c_str());
+            			Serial.println("SENT");
+        		}else 
+        		{	
+				publishData(MQTT_SMS_RESULT,jsonSerialize(to,401,"CANT_SENT",messageId).c_str());
+            			Serial.println("CAN'T SEND");
+        		}
+      		}
+      		else
+      		{
+        		publishData(MQTT_SMS_RESULT,jsonSerialize(to,400,"BAD_REQUEST",messageId).c_str());
+      		}
         setSIMReady();
       }
 }
@@ -95,4 +94,7 @@ void MQTTsetup() {
 void MQTTloop(void)
 {
  client.loop();
+ if (!client.connected()) {
+    reconnect();
+  }	
 }
