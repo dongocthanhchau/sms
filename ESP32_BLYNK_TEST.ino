@@ -106,7 +106,7 @@ void TaskWifi(void *pvParameters)  // This is a task.
   for (;;)
   {
     MQTTloop();
-    
+    vTaskDelay(2000/portTICK_PERIOD_MS);
     //Nothing Here
   }
 }
