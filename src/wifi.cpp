@@ -21,6 +21,7 @@
 #include <HTTPClient.h>
 #include <WiFiUdp.h>
 #include "ready.h"
+#include "blynk.h"
 
 String ssid = "SMS-WifiConfig";
 String pass = "";
