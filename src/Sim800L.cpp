@@ -188,6 +188,7 @@ long balanceCheck(void)
 }
 bool smsSend(String num, String msg)
 {
+  delay(5000);
   setnotSIMReady();
   //hwSerial.flush();
   vTaskDelay(500/portTICK_PERIOD_MS);

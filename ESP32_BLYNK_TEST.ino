@@ -67,9 +67,10 @@ void setup() {
 void loop()
 {
   // Empty. Things are done in Tasks.
-  if (millis()>43000000)
+  if (millis()>43199997)
     {
-      Serial.println("RESETING...");
+      Serial.println("IT'S "+getTime());
+      Serial.println("RESETTING, PLEASE WAIT...");
       ESP.restart();
     }
    vTaskDelay(5000/portTICK_PERIOD_MS);
@@ -134,13 +135,13 @@ void TaskButton(void *pvParameters)  // This is a task.
   for (;;) // A Task shall never return or exit.
   {
     //Serial.println(analogRead(BUTTON));
-    if (!digitalRead(BUTTON))
+    if (analogRead(BUTTON)<10)
     { 
     t-=-1;
     }else t=-1;
     
-    vTaskDelay(100/portTICK_PERIOD_MS);
-    if (t>RESET_TIME*10) 
+    vTaskDelay(10/portTICK_PERIOD_MS);
+    if (t>RESET_TIME*100) 
     {
       Serial.println("LONG CLICK");
       ApMode();

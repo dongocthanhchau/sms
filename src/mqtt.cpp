@@ -18,7 +18,7 @@ void reconnect() {
   // Loop until we're reconnected
   static int re = 0;
   while (!client.connected()) {
-    Serial.println("Connecting to MQTT...");
+    Serial.print("Connecting to MQTT...");
     // Create a random client ID
     String clientId = "ESP32Client-";
     clientId += String(random(0xffff), HEX);
@@ -30,7 +30,12 @@ void reconnect() {
     } else {
       Serial.print(".");
       re++;
-      if (re>10) ESP.restart();
+      if (re>19)
+	{
+		Serial.println("CAN'T CONNECT TO MQTT");
+		Serial.println("RESETTING, PLEASE WAIT...");
+		ESP.restart();
+	}
     }
   }
 }
