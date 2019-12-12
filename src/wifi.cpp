@@ -21,8 +21,9 @@
 #include <HTTPClient.h>
 #include <WiFiUdp.h>
 #include "ready.h"
+#include "config.h"
 
-String ssid = "SMS-WifiConfig";
+String ssid = "SMSConfig-";
 String pass = "";
 
 
@@ -56,12 +57,14 @@ void wifiReqHandle(void)
       //Serial.println(ssid);
       //Serial.println(pass);
       //WiFi.end();
-      WiFi.begin(ssid.c_str(), pass.c_str());
+      changeData("ssid",ssid);
+      changeData("password",pass);
+      //WiFi.begin(ssid.c_str(), pass.c_str());
       //Serial.println("CONNECTING TO "+ssid);
-      vTaskDelay(2000/portTICK_PERIOD_MS);
-      while (WiFi.status() != WL_CONNECTED) {
+      //vTaskDelay(2000/portTICK_PERIOD_MS);
+      //while (WiFi.status() != WL_CONNECTED) {
 //        //delay(500);        
-      }
+      //}
       //delay(5000);
       
       ESP.restart();
@@ -228,24 +231,35 @@ void balanceincHandle(void)
 void ApMode(void)
 {
   WiFi.mode(WIFI_MODE_AP);
-  ssid += String(random(0xffff), HEX);
+  String WFSSID = getData("deviceID");
+  WFSSID.toUpperCase();
+  ssid += WFSSID;
   WiFi.softAP(ssid.c_str(), pass.c_str());
   Serial.println("AP Mode");
 }
 
 bool wifiInit(void)
 {
-  WiFi.begin();
+  spiffBegin();
+  WiFi.mode(WIFI_MODE_STA);
+  WiFi.begin(getData("ssid").c_str(),getData("password").c_str());
+  
   long t = millis();
   while (WiFi.status() != WL_CONNECTED) {
       //delay(500);
       if (millis()-t>20000) 
       {
         ApMode();
+        return 1;
         break;
+        
       }
   }
   Serial.println("CONNECTED to: "+WiFi.SSID());
+  delay(500);
+  IPAddress ip = WiFi.localIP();
+  Serial.print("IP Address: ");
+  Serial.println(ip.toString());
   if (!MDNS.begin("sms")) return 0;
   
 //----------------------------------------------
@@ -259,5 +273,6 @@ bool wifiInit(void)
   Aserver.onNotFound(notFound);
   Aserver.begin();
   MDNS.addService("http", "tcp", 80);
+  changeData("ipaddress",ip.toString());
   return 1;
 }

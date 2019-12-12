@@ -1,0 +1,25 @@
+{
+"device":
+{
+                      "deviceID":"CDNT"
+},
+"wifi":
+{
+                      "ssid":"CRETA-KD",
+                      "password":"yoursolution",
+                      "ipaddress":"192.168.3.127"
+},
+"mqtt":
+{
+                     "host":"cretabase.kbvision.tv",
+                     "port":"1883",
+                     "username":"leiioxwr",
+                     "password":"98NW8KaE_FCH",
+                     "topic":
+                      {
+                                              "status":"/status",
+                                              "command":"/cmd",
+                                              "result":"/result"
+                      }
+}
+}

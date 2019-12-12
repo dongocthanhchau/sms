@@ -4,8 +4,9 @@
 #include "src\blynk.h"
 #include "src\mqtt.h"
 #include "src\NTPClock.h"
+#include "src\config.h"
 
-int ledDelay = 1500/portTICK_PERIOD_MS;
+int ledDelay = 500/portTICK_PERIOD_MS;
 
 #if CONFIG_FREERTOS_UNICORE
 #define ARDUINO_RUNNING_CORE 0
@@ -67,13 +68,14 @@ void setup() {
 void loop()
 {
   // Empty. Things are done in Tasks.
-  if (millis()>43000000)
+  if (millis()>43199997)
     {
-      Serial.println("RESETING...");
+      Serial.println("IT'S "+getTime());
+      Serial.println("RESETTING, PLEASE WAIT...");
       ESP.restart();
     }
-   vTaskDelay(5000/portTICK_PERIOD_MS);
-   String state = "{\"status\":\"Running\",\"time\":" +  getTime() + "}";
+   vTaskDelay(2500/portTICK_PERIOD_MS);
+   String state = "{\"status\":\"Running\",\"deiveID\": " + getData("deviceID") +",\"wifi\":{\"SSID\": \""+getData("ssid")+"\",\"LocalIP\":"+ getData("ipaddress") +" } ,\"time\":" +  getTime() +",\"runtime\":" + String(millis()) +"}";
    
    publishData("/STATUS",state.c_str());
    reconnect();
@@ -101,12 +103,13 @@ void TaskWifi(void *pvParameters)  // This is a task.
 {
   (void) pvParameters;
   Serial.println(wifiInit()?"WIFI Done":"WIFI FAIL");
+  
   MQTTsetup();
   NTPInit();
   for (;;)
   {
     MQTTloop();
-    
+    vTaskDelay(2000/portTICK_PERIOD_MS);
     //Nothing Here
   }
 }
@@ -114,8 +117,10 @@ void TaskSim800(void *pvParameters)
 {
   (void) pvParameters;
   Serial.println(sim800Init()?"SIM 800 Done":"SIM 800 FAIL");
+  ledDelay = 5000/portTICK_PERIOD_MS; 
   for (;;)
   {
+    
     //balanceInc("315329942286398");
     //vTaskDelay(5000/portTICK_PERIOD_MS);
     //Serial.println(balanceCheck());
@@ -131,18 +136,18 @@ void TaskButton(void *pvParameters)  // This is a task.
   for (;;) // A Task shall never return or exit.
   {
     //Serial.println(analogRead(BUTTON));
-    if (!digitalRead(BUTTON))
+    if (analogRead(BUTTON)<10)
     { 
     t-=-1;
     }else t=-1;
     
-    vTaskDelay(100/portTICK_PERIOD_MS);
-    if (t>RESET_TIME*10) 
+    vTaskDelay(10/portTICK_PERIOD_MS);
+    if (t>RESET_TIME*100) 
     {
       Serial.println("LONG CLICK");
       ApMode();
       t=-1;
-      ledDelay = 200/portTICK_PERIOD_MS;
+      ledDelay = 100/portTICK_PERIOD_MS;
       vTaskDelay(1000/portTICK_PERIOD_MS);
     }
 //    else if (t>10) 

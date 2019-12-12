@@ -1,6 +1,7 @@
 #ifndef _wifi__h_
 #define _wifi__h_
 
+#include <String.h>
 
 
 void ApMode(void);
